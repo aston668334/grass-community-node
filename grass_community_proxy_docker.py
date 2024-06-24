@@ -19,12 +19,12 @@ proxy_list_str = os.getenv("PROXY_LIST")
 PROXY_LIST = ast.literal_eval(proxy_list_str)
 
 
-async def connect_to_wss(proxy, user_id):
-    device_id = str(uuid.uuid3(uuid.NAMESPACE_DNS, proxy))
+# Async function to connect to WebSocket server
+async def connect_to_wss(http_proxy, user_id):
+    device_id = str(uuid.uuid3(uuid.NAMESPACE_DNS, http_proxy))
     logger.info(device_id)
     while True:
         try:
-            proxy = Proxy.from_url(proxy)
             await asyncio.sleep(random.randint(1, 10) / 10)
             custom_headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
@@ -34,8 +34,9 @@ async def connect_to_wss(proxy, user_id):
             ssl_context.verify_mode = ssl.CERT_NONE
             uri = "wss://proxy.wynd.network:4650/"
             server_hostname = "proxy.wynd.network"
-            async with proxy_connect(uri, proxy=proxy, ssl=ssl_context, extra_headers=custom_headers,
-                                          server_hostname=server_hostname) as websocket:
+            proxy = Proxy.from_url(http_proxy)
+            async with proxy_connect(uri, proxy=proxy, ssl=ssl_context, server_hostname=server_hostname,
+                                     extra_headers=custom_headers) as websocket:
                 async def send_ping():
                     while True:
                         send_message = json.dumps(
@@ -72,8 +73,12 @@ async def connect_to_wss(proxy, user_id):
                         pong_response = {"id": message["id"], "origin_action": "PONG"}
                         logger.debug(pong_response)
                         await websocket.send(json.dumps(pong_response))
+        except asyncio.CancelledError:
+            logger.info(f"Task for proxy {http_proxy} cancelled")
+            break
         except Exception as e:
             logger.error(e)
+            logger.error(http_proxy)
 
 
 async def shutdown(loop, signal=None):
