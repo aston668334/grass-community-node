@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  grass-community-node:
+    image: astonlee6403/grass-community-node:latest
+    environment:
+      - GRASS_USERID=your_userid
+      # - USE_PROXY=true
+      # - PROXY_LIST=['http://127.0.01:80','sockes4://127.0.0.1:455']
+    restart: unless-stopped
