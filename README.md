@@ -4,7 +4,7 @@
 Automated mining for Grass.
 
 ## Theory
-Using web socks to mimic communication between Grass extension ans Grass server.
+Using web socks to mimic communication between Grass community node extension and Grass server.
 
 ## Usage
 ### first usage 
