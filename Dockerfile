@@ -1,5 +1,5 @@
-FROM python:3.9-alpine as base
-FROM base as builder
+FROM python:3.9-alpine AS base
+FROM base AS builder
 
 RUN apk update && apk add nano curl net-tools iputils python3 py3-pip
 
@@ -9,6 +9,8 @@ RUN mkdir app
 COPY /requirements.txt app
 COPY /grass_community_proxy.py app
 COPY /grass_community_no_proxy.py app
+COPY /entrypoint.sh app
+
 
 WORKDIR /opt/app
 
